@@ -25,6 +25,7 @@ class CadastroUsuarioFormTests {
 	void deveRejeitarDadosInvalidos() {
 		CadastroUsuarioForm form = new CadastroUsuarioForm();
 		form.setNome(" ");
+		form.setNomeUsuario("usuario invalido");
 		form.setEmail("email-invalido");
 		form.setSenha("123");
 
@@ -33,13 +34,14 @@ class CadastroUsuarioFormTests {
 				.map(Object::toString)
 				.collect(Collectors.toSet());
 
-		assertThat(camposInvalidos).contains("nome", "email", "senha");
+		assertThat(camposInvalidos).contains("nome", "nomeUsuario", "email", "senha");
 	}
 
 	@Test
 	void deveAceitarDadosValidos() {
 		CadastroUsuarioForm form = new CadastroUsuarioForm();
 		form.setNome("Maria Silva");
+		form.setNomeUsuario("maria.silva");
 		form.setEmail("maria@example.com");
 		form.setSenha("senha-segura");
 

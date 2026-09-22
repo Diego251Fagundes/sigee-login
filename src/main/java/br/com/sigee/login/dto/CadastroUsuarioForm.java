@@ -2,6 +2,7 @@ package br.com.sigee.login.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 /**
@@ -12,6 +13,14 @@ public class CadastroUsuarioForm {
 	@NotBlank(message = "Informe o nome.")
 	@Size(min = 3, max = 100, message = "O nome deve ter entre 3 e 100 caracteres.")
 	private String nome;
+
+	@NotBlank(message = "Informe o nome de usuario.")
+	@Size(min = 3, max = 30, message = "O nome de usuario deve ter entre 3 e 30 caracteres.")
+	@Pattern(
+			regexp = "^[A-Za-z0-9._-]+$",
+			message = "O nome de usuario deve conter apenas letras, numeros, ponto, hifen ou sublinhado."
+	)
+	private String nomeUsuario;
 
 	@NotBlank(message = "Informe o e-mail.")
 	@Email(message = "Informe um e-mail valido.")
@@ -28,6 +37,14 @@ public class CadastroUsuarioForm {
 
 	public void setNome(String nome) {
 		this.nome = nome;
+	}
+
+	public String getNomeUsuario() {
+		return nomeUsuario;
+	}
+
+	public void setNomeUsuario(String nomeUsuario) {
+		this.nomeUsuario = nomeUsuario;
 	}
 
 	public String getEmail() {

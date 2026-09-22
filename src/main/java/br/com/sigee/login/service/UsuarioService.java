@@ -7,7 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import br.com.sigee.login.dto.CadastroUsuarioForm;
-import br.com.sigee.login.exception.EmailJaCadastradoException;
+import br.com.sigee.login.exception.UsuarioJaCadastradoException;
 import br.com.sigee.login.model.Role;
 import br.com.sigee.login.model.Usuario;
 import br.com.sigee.login.repository.UsuarioRepository;
@@ -27,14 +27,17 @@ public class UsuarioService {
 	}
 
 	public Usuario cadastrar(CadastroUsuarioForm form) {
+		String nomeUsuarioNormalizado = normalizarNomeUsuario(form.getNomeUsuario());
 		String emailNormalizado = normalizarEmail(form.getEmail());
 
-		if (usuarioRepository.existsByEmail(emailNormalizado)) {
-			throw new EmailJaCadastradoException();
+		if (usuarioRepository.existsByNomeUsuario(nomeUsuarioNormalizado)
+				|| usuarioRepository.existsByEmail(emailNormalizado)) {
+			throw new UsuarioJaCadastradoException();
 		}
 
 		Usuario usuario = new Usuario(
 				form.getNome().trim(),
+				nomeUsuarioNormalizado,
 				emailNormalizado,
 				passwordEncoder.encode(form.getSenha()),
 				Role.PROFESSOR
@@ -43,8 +46,12 @@ public class UsuarioService {
 		try {
 			return usuarioRepository.save(usuario);
 		} catch (DuplicateKeyException exception) {
-			throw new EmailJaCadastradoException(exception);
+			throw new UsuarioJaCadastradoException(exception);
 		}
+	}
+
+	private String normalizarNomeUsuario(String nomeUsuario) {
+		return nomeUsuario.trim().toLowerCase(Locale.ROOT);
 	}
 
 	private String normalizarEmail(String email) {

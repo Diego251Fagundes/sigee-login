@@ -11,7 +11,11 @@ import br.com.sigee.login.model.Usuario;
  */
 public interface UsuarioRepository extends MongoRepository<Usuario, String> {
 
+	Optional<Usuario> findByNomeUsuario(String nomeUsuario);
+
 	Optional<Usuario> findByEmail(String email);
+
+	boolean existsByNomeUsuario(String nomeUsuario);
 
 	boolean existsByEmail(String email);
 }

@@ -16,7 +16,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import br.com.sigee.login.dto.CadastroUsuarioForm;
-import br.com.sigee.login.exception.EmailJaCadastradoException;
+import br.com.sigee.login.exception.UsuarioJaCadastradoException;
 import br.com.sigee.login.model.Role;
 import br.com.sigee.login.model.Usuario;
 import br.com.sigee.login.repository.UsuarioRepository;
@@ -37,8 +37,9 @@ class UsuarioServiceTests {
 	}
 
 	@Test
-	void deveCadastrarProfessorComEmailNormalizadoESenhaProtegida() {
+	void deveCadastrarProfessorComIdentificadoresNormalizadosESenhaProtegida() {
 		CadastroUsuarioForm form = criarFormValido();
+		when(usuarioRepository.existsByNomeUsuario("maria.silva")).thenReturn(false);
 		when(usuarioRepository.existsByEmail("maria@example.com")).thenReturn(false);
 		when(usuarioRepository.save(any(Usuario.class)))
 				.thenAnswer(invocacao -> invocacao.getArgument(0));
@@ -46,6 +47,7 @@ class UsuarioServiceTests {
 		Usuario usuario = usuarioService.cadastrar(form);
 
 		assertThat(usuario.getNome()).isEqualTo("Maria Silva");
+		assertThat(usuario.getNomeUsuario()).isEqualTo("maria.silva");
 		assertThat(usuario.getEmail()).isEqualTo("maria@example.com");
 		assertThat(usuario.getRole()).isEqualTo(Role.PROFESSOR);
 		assertThat(usuario.getSenhaHash()).isNotEqualTo(form.getSenha());
@@ -53,13 +55,27 @@ class UsuarioServiceTests {
 	}
 
 	@Test
+	void naoDeveCadastrarNomeDeUsuarioDuplicado() {
+		CadastroUsuarioForm form = criarFormValido();
+		when(usuarioRepository.existsByNomeUsuario("maria.silva")).thenReturn(true);
+
+		assertThatThrownBy(() -> usuarioService.cadastrar(form))
+				.isInstanceOf(UsuarioJaCadastradoException.class)
+				.hasMessage("O nome de usuario ou e-mail informado ja esta cadastrado.");
+
+		verify(usuarioRepository, never()).existsByEmail(any());
+		verify(usuarioRepository, never()).save(any(Usuario.class));
+	}
+
+	@Test
 	void naoDeveCadastrarEmailDuplicado() {
 		CadastroUsuarioForm form = criarFormValido();
+		when(usuarioRepository.existsByNomeUsuario("maria.silva")).thenReturn(false);
 		when(usuarioRepository.existsByEmail("maria@example.com")).thenReturn(true);
 
 		assertThatThrownBy(() -> usuarioService.cadastrar(form))
-				.isInstanceOf(EmailJaCadastradoException.class)
-				.hasMessage("O e-mail informado ja esta cadastrado.");
+				.isInstanceOf(UsuarioJaCadastradoException.class)
+				.hasMessage("O nome de usuario ou e-mail informado ja esta cadastrado.");
 
 		verify(usuarioRepository, never()).save(any(Usuario.class));
 	}
@@ -67,18 +83,20 @@ class UsuarioServiceTests {
 	@Test
 	void deveTratarConflitoDeIndiceUnico() {
 		CadastroUsuarioForm form = criarFormValido();
+		when(usuarioRepository.existsByNomeUsuario("maria.silva")).thenReturn(false);
 		when(usuarioRepository.existsByEmail("maria@example.com")).thenReturn(false);
 		when(usuarioRepository.save(any(Usuario.class)))
 				.thenThrow(new DuplicateKeyException("E-mail duplicado"));
 
 		assertThatThrownBy(() -> usuarioService.cadastrar(form))
-				.isInstanceOf(EmailJaCadastradoException.class)
+				.isInstanceOf(UsuarioJaCadastradoException.class)
 				.hasCauseInstanceOf(DuplicateKeyException.class);
 	}
 
 	private CadastroUsuarioForm criarFormValido() {
 		CadastroUsuarioForm form = new CadastroUsuarioForm();
 		form.setNome("  Maria Silva  ");
+		form.setNomeUsuario("  MARIA.SILVA  ");
 		form.setEmail("  MARIA@EXAMPLE.COM  ");
 		form.setSenha("senha-segura");
 		return form;

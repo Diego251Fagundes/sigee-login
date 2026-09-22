@@ -17,6 +17,9 @@ public class Usuario {
 	private String nome;
 
 	@Indexed(unique = true)
+	private String nomeUsuario;
+
+	@Indexed(unique = true)
 	private String email;
 
 	private String senhaHash;
@@ -26,8 +29,9 @@ public class Usuario {
 	public Usuario() {
 	}
 
-	public Usuario(String nome, String email, String senhaHash, Role role) {
+	public Usuario(String nome, String nomeUsuario, String email, String senhaHash, Role role) {
 		this.nome = nome;
+		this.nomeUsuario = nomeUsuario;
 		this.email = email;
 		this.senhaHash = senhaHash;
 		this.role = role;
@@ -47,6 +51,14 @@ public class Usuario {
 
 	public void setNome(String nome) {
 		this.nome = nome;
+	}
+
+	public String getNomeUsuario() {
+		return nomeUsuario;
+	}
+
+	public void setNomeUsuario(String nomeUsuario) {
+		this.nomeUsuario = nomeUsuario;
 	}
 
 	public String getEmail() {
