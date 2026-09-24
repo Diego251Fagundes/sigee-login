@@ -37,7 +37,7 @@ class UsuarioServiceTests {
 	}
 
 	@Test
-	void deveCadastrarProfessorComIdentificadoresNormalizadosESenhaProtegida() {
+	void deveCadastrarComPerfilSelecionadoIdentificadoresNormalizadosESenhaProtegida() {
 		CadastroUsuarioForm form = criarFormValido();
 		when(usuarioRepository.existsByNomeUsuario("maria.silva")).thenReturn(false);
 		when(usuarioRepository.existsByEmail("maria@example.com")).thenReturn(false);
@@ -46,12 +46,38 @@ class UsuarioServiceTests {
 
 		Usuario usuario = usuarioService.cadastrar(form);
 
-		assertThat(usuario.getNome()).isEqualTo("Maria Silva");
+		assertThat(usuario.getNome()).isEqualTo("Maria");
+		assertThat(usuario.getSobrenome()).isEqualTo("Silva");
 		assertThat(usuario.getNomeUsuario()).isEqualTo("maria.silva");
 		assertThat(usuario.getEmail()).isEqualTo("maria@example.com");
-		assertThat(usuario.getRole()).isEqualTo(Role.PROFESSOR);
+		assertThat(usuario.getRole()).isEqualTo(Role.OPERADOR);
+		assertThat(usuario.isAtivo()).isTrue();
 		assertThat(usuario.getSenhaHash()).isNotEqualTo(form.getSenha());
 		assertThat(passwordEncoder.matches(form.getSenha(), usuario.getSenhaHash())).isTrue();
+	}
+
+	@Test
+	void naoDeveCadastrarQuandoAsSenhasForemDiferentes() {
+		CadastroUsuarioForm form = criarFormValido();
+		form.setConfirmacaoSenha("outra-senha");
+
+		assertThatThrownBy(() -> usuarioService.cadastrar(form))
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("A senha e a confirmacao devem ser iguais.");
+
+		verify(usuarioRepository, never()).save(any(Usuario.class));
+	}
+
+	@Test
+	void naoDeveCadastrarSemPerfil() {
+		CadastroUsuarioForm form = criarFormValido();
+		form.setRole(null);
+
+		assertThatThrownBy(() -> usuarioService.cadastrar(form))
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("Selecione um perfil valido.");
+
+		verify(usuarioRepository, never()).save(any(Usuario.class));
 	}
 
 	@Test
@@ -95,10 +121,13 @@ class UsuarioServiceTests {
 
 	private CadastroUsuarioForm criarFormValido() {
 		CadastroUsuarioForm form = new CadastroUsuarioForm();
-		form.setNome("  Maria Silva  ");
+		form.setNome("  Maria  ");
+		form.setSobrenome("  Silva  ");
 		form.setNomeUsuario("  MARIA.SILVA  ");
 		form.setEmail("  MARIA@EXAMPLE.COM  ");
+		form.setRole(Role.OPERADOR);
 		form.setSenha("senha-segura");
+		form.setConfirmacaoSenha("senha-segura");
 		return form;
 	}
 }

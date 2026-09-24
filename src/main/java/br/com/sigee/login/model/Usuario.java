@@ -1,5 +1,7 @@
 package br.com.sigee.login.model;
 
+import java.time.Instant;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -16,6 +18,8 @@ public class Usuario {
 
 	private String nome;
 
+	private String sobrenome;
+
 	@Indexed(unique = true)
 	private String nomeUsuario;
 
@@ -26,15 +30,31 @@ public class Usuario {
 
 	private Role role;
 
+	private boolean ativo;
+
+	private int tentativasLoginInvalidas;
+
+	private Instant bloqueadoAte;
+
 	public Usuario() {
 	}
 
-	public Usuario(String nome, String nomeUsuario, String email, String senhaHash, Role role) {
+	public Usuario(
+			String nome,
+			String sobrenome,
+			String nomeUsuario,
+			String email,
+			String senhaHash,
+			Role role,
+			boolean ativo
+	) {
 		this.nome = nome;
+		this.sobrenome = sobrenome;
 		this.nomeUsuario = nomeUsuario;
 		this.email = email;
 		this.senhaHash = senhaHash;
 		this.role = role;
+		this.ativo = ativo;
 	}
 
 	public String getId() {
@@ -51,6 +71,14 @@ public class Usuario {
 
 	public void setNome(String nome) {
 		this.nome = nome;
+	}
+
+	public String getSobrenome() {
+		return sobrenome;
+	}
+
+	public void setSobrenome(String sobrenome) {
+		this.sobrenome = sobrenome;
 	}
 
 	public String getNomeUsuario() {
@@ -83,5 +111,29 @@ public class Usuario {
 
 	public void setRole(Role role) {
 		this.role = role;
+	}
+
+	public boolean isAtivo() {
+		return ativo;
+	}
+
+	public void setAtivo(boolean ativo) {
+		this.ativo = ativo;
+	}
+
+	public int getTentativasLoginInvalidas() {
+		return tentativasLoginInvalidas;
+	}
+
+	public void setTentativasLoginInvalidas(int tentativasLoginInvalidas) {
+		this.tentativasLoginInvalidas = tentativasLoginInvalidas;
+	}
+
+	public Instant getBloqueadoAte() {
+		return bloqueadoAte;
+	}
+
+	public void setBloqueadoAte(Instant bloqueadoAte) {
+		this.bloqueadoAte = bloqueadoAte;
 	}
 }

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import br.com.sigee.login.dto.CadastroUsuarioForm;
 import br.com.sigee.login.exception.UsuarioJaCadastradoException;
-import br.com.sigee.login.model.Role;
 import br.com.sigee.login.model.Usuario;
 import br.com.sigee.login.repository.UsuarioRepository;
 
@@ -27,6 +26,13 @@ public class UsuarioService {
 	}
 
 	public Usuario cadastrar(CadastroUsuarioForm form) {
+		if (!form.isSenhaConfirmada()) {
+			throw new IllegalArgumentException("A senha e a confirmacao devem ser iguais.");
+		}
+		if (form.getRole() == null) {
+			throw new IllegalArgumentException("Selecione um perfil valido.");
+		}
+
 		String nomeUsuarioNormalizado = normalizarNomeUsuario(form.getNomeUsuario());
 		String emailNormalizado = normalizarEmail(form.getEmail());
 
@@ -37,10 +43,12 @@ public class UsuarioService {
 
 		Usuario usuario = new Usuario(
 				form.getNome().trim(),
+				form.getSobrenome().trim(),
 				nomeUsuarioNormalizado,
 				emailNormalizado,
 				passwordEncoder.encode(form.getSenha()),
-				Role.PROFESSOR
+				form.getRole(),
+				true
 		);
 
 		try {

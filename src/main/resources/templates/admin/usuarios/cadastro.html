@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+		xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Cadastro de usuário | SIGEE</title>
+	<link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+	<header class="topbar">
+		<a class="brand" th:href="@{/}" aria-label="SIGEE - página inicial">SIGEE</a>
+		<div class="account-actions">
+			<span class="account-name" sec:authentication="name"></span>
+			<a class="button button-secondary" th:href="@{/}">Voltar ao início</a>
+			<form th:action="@{/logout}" method="post">
+				<button class="button button-secondary" type="submit">Sair</button>
+			</form>
+		</div>
+	</header>
+
+	<main class="page page-form">
+		<section class="page-heading" aria-labelledby="titulo-pagina">
+			<p class="eyebrow">Administração de usuários</p>
+			<h1 id="titulo-pagina">Cadastrar usuário</h1>
+			<p>Crie uma conta comum e atribua um único perfil funcional.</p>
+		</section>
+
+		<div class="alert alert-success" role="status" th:if="${mensagemSucesso}" th:text="${mensagemSucesso}"></div>
+
+		<section class="card form-card" aria-labelledby="dados-usuario-title">
+			<header class="card-header">
+				<h2 id="dados-usuario-title">Dados do usuário</h2>
+				<p>Todos os campos são obrigatórios.</p>
+			</header>
+
+			<form id="cadastro-form" class="form-grid" th:action="@{/admin/usuarios/cadastro}"
+					th:object="${cadastroUsuarioForm}" method="post" novalidate>
+				<div id="form-error-summary" class="alert alert-error error-summary form-full" role="alert"
+						tabindex="-1" th:if="${#fields.hasAnyErrors()}">
+					<h3>Revise os campos indicados</h3>
+					<ul>
+						<li th:if="${#fields.hasErrors('nome')}"><a href="#nome" th:text="${#fields.errors('nome')[0]}"></a></li>
+						<li th:if="${#fields.hasErrors('sobrenome')}"><a href="#sobrenome" th:text="${#fields.errors('sobrenome')[0]}"></a></li>
+						<li th:if="${#fields.hasErrors('email')}"><a href="#email" th:text="${#fields.errors('email')[0]}"></a></li>
+						<li th:if="${#fields.hasErrors('nomeUsuario')}"><a href="#nomeUsuario" th:text="${#fields.errors('nomeUsuario')[0]}"></a></li>
+						<li th:if="${#fields.hasErrors('role')}"><a href="#role" th:text="${#fields.errors('role')[0]}"></a></li>
+						<li th:if="${#fields.hasErrors('senha')}"><a href="#senha" th:text="${#fields.errors('senha')[0]}"></a></li>
+						<li th:if="${#fields.hasErrors('confirmacaoSenha')}"><a href="#confirmacaoSenha" th:text="${#fields.errors('confirmacaoSenha')[0]}"></a></li>
+						<li th:if="${#fields.hasErrors('senhaConfirmada')}"><a href="#confirmacaoSenha" th:text="${#fields.errors('senhaConfirmada')[0]}"></a></li>
+						<li th:each="erro : ${#fields.globalErrors()}"><a href="#cadastro-form" th:text="${erro}"></a></li>
+					</ul>
+				</div>
+
+				<div class="field">
+					<label for="nome">Nome <span class="required-marker" aria-hidden="true">*</span><span class="sr-only"> obrigatório</span></label>
+					<input id="nome" type="text" th:field="*{nome}" autocomplete="given-name" required
+							th:classappend="${#fields.hasErrors('nome')} ? 'is-invalid'"
+							th:attr="aria-invalid=${#fields.hasErrors('nome')},aria-describedby=${#fields.hasErrors('nome')} ? 'nome-error'">
+					<p id="nome-error" class="field-error" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></p>
+				</div>
+
+				<div class="field">
+					<label for="sobrenome">Sobrenome <span class="required-marker" aria-hidden="true">*</span><span class="sr-only"> obrigatório</span></label>
+					<input id="sobrenome" type="text" th:field="*{sobrenome}" autocomplete="family-name" required
+							th:classappend="${#fields.hasErrors('sobrenome')} ? 'is-invalid'"
+							th:attr="aria-invalid=${#fields.hasErrors('sobrenome')},aria-describedby=${#fields.hasErrors('sobrenome')} ? 'sobrenome-error'">
+					<p id="sobrenome-error" class="field-error" th:if="${#fields.hasErrors('sobrenome')}" th:errors="*{sobrenome}"></p>
+				</div>
+
+				<div class="field">
+					<label for="email">E-mail <span class="required-marker" aria-hidden="true">*</span><span class="sr-only"> obrigatório</span></label>
+					<input id="email" type="email" th:field="*{email}" autocomplete="email" required
+							th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"
+							th:attr="aria-invalid=${#fields.hasErrors('email')},aria-describedby=${#fields.hasErrors('email')} ? 'email-error'">
+					<p id="email-error" class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+				</div>
+
+				<div class="field">
+					<label for="nomeUsuario">Nome de usuário <span class="required-marker" aria-hidden="true">*</span><span class="sr-only"> obrigatório</span></label>
+					<input id="nomeUsuario" type="text" th:field="*{nomeUsuario}" autocomplete="username" required
+							th:classappend="${#fields.hasErrors('nomeUsuario')} ? 'is-invalid'"
+							th:attr="aria-invalid=${#fields.hasErrors('nomeUsuario')},aria-describedby=${#fields.hasErrors('nomeUsuario')} ? 'nomeUsuario-error'">
+					<p id="nomeUsuario-error" class="field-error" th:if="${#fields.hasErrors('nomeUsuario')}" th:errors="*{nomeUsuario}"></p>
+				</div>
+
+				<div class="field form-full">
+					<label for="role">Perfil <span class="required-marker" aria-hidden="true">*</span><span class="sr-only"> obrigatório</span></label>
+					<select id="role" th:field="*{role}" required
+							th:classappend="${#fields.hasErrors('role')} ? 'is-invalid'"
+							th:attr="aria-invalid=${#fields.hasErrors('role')},aria-describedby=${#fields.hasErrors('role')} ? 'role-error'">
+						<option value="">Selecione um perfil</option>
+						<option th:each="perfil : ${perfis}" th:value="${perfil}" th:text="${perfil}"></option>
+					</select>
+					<p id="role-error" class="field-error" th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></p>
+				</div>
+
+				<div class="field">
+					<label for="senha">Senha inicial <span class="required-marker" aria-hidden="true">*</span><span class="sr-only"> obrigatório</span></label>
+					<input id="senha" type="password" th:field="*{senha}" autocomplete="new-password" required
+							th:classappend="${#fields.hasErrors('senha')} ? 'is-invalid'"
+							th:attr="aria-invalid=${#fields.hasErrors('senha')},aria-describedby=${#fields.hasErrors('senha')} ? 'senha-hint senha-error' : 'senha-hint'">
+					<p id="senha-hint" class="field-hint">Use entre 8 e 72 caracteres.</p>
+					<p id="senha-error" class="field-error" th:if="${#fields.hasErrors('senha')}" th:errors="*{senha}"></p>
+				</div>
+
+				<div class="field">
+					<label for="confirmacaoSenha">Confirmação da senha <span class="required-marker" aria-hidden="true">*</span><span class="sr-only"> obrigatório</span></label>
+					<input id="confirmacaoSenha" type="password" th:field="*{confirmacaoSenha}"
+							autocomplete="new-password" required
+							th:classappend="${#fields.hasErrors('confirmacaoSenha') or #fields.hasErrors('senhaConfirmada')} ? 'is-invalid'"
+							th:attr="aria-invalid=${#fields.hasErrors('confirmacaoSenha') or #fields.hasErrors('senhaConfirmada')},aria-describedby=${#fields.hasErrors('confirmacaoSenha') or #fields.hasErrors('senhaConfirmada')} ? 'confirmacaoSenha-error senhaConfirmada-error'">
+					<p id="confirmacaoSenha-error" class="field-error" th:if="${#fields.hasErrors('confirmacaoSenha')}" th:errors="*{confirmacaoSenha}"></p>
+					<p id="senhaConfirmada-error" class="field-error" th:if="${#fields.hasErrors('senhaConfirmada')}" th:errors="*{senhaConfirmada}"></p>
+				</div>
+
+				<div class="form-actions form-full">
+					<a class="button button-secondary" th:href="@{/}">Cancelar</a>
+					<button class="button button-primary" type="submit">Cadastrar usuário</button>
+				</div>
+			</form>
+		</section>
+	</main>
+	<script th:src="@{/js/form-errors.js}"></script>
+</body>
+</html>
