@@ -15,6 +15,9 @@ import br.com.sigee.login.model.Role;
 import br.com.sigee.login.service.UsuarioService;
 import jakarta.validation.Valid;
 
+/**
+ * Disponibiliza o cadastro administrativo e encaminha os dados validados ao serviço de usuários.
+ */
 @Controller
 @RequestMapping("/admin/usuarios")
 public class CadastroUsuarioController {

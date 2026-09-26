@@ -4,6 +4,9 @@ import org.mongodb.spring.session.config.annotation.web.http.EnableMongoHttpSess
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Mantém as sessões HTTP no MongoDB quando a integração de sessão está habilitada.
+ */
 @Configuration
 @EnableMongoHttpSession
 @ConditionalOnProperty(

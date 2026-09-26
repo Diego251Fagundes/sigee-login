@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+		xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+	<header class="topbar" th:fragment="topbar(mostrarVoltar)">
+		<a class="brand" th:href="@{/}" aria-label="SIGEE - página inicial">SIGEE</a>
+		<div class="account-actions">
+			<span class="account-name" sec:authentication="name"></span>
+			<a class="button button-secondary" th:if="${mostrarVoltar}" th:href="@{/}">Voltar ao início</a>
+			<form th:action="@{/logout}" method="post">
+				<button class="button button-secondary" type="submit">Sair</button>
+			</form>
+		</div>
+	</header>
+</body>
+</html>
